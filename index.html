@@ -4,7 +4,7 @@
 <style type="text/css" href="project0.css"></style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <!--Put your D3 import statement between these two lines-->
-    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
 <!--Put your D3 import statement between these two lines-->
 </head>
 
@@ -34,8 +34,91 @@
     
     <script type="text/javascript">
         // Put your part one code here ***********************
+        // Code referred: http://learnjsdata.com/read_data.html
+        // v5 loads row by row, and v4 reads the csv file in batch.
+        // http://www.tutorialsteacher.com/d3js/loading-data-from-file-in-d3js#d3.csv
+        //var dataset;
 
+        // set the dimensions and margins of the graph
+        var margin = {top: 20, right: 20, bottom: 30, left: 50};
+        var width = 960 - margin.left - margin.right;
+        var height = 500 - margin.top - margin.bottom;
         
+        // set the ranges
+        var x = d3.scaleLinear().range([0, width]);
+        var y = d3.scaleLinear().range([height, 0]);
+        
+        // append the svg obgect to the body of the page
+        // appends a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.right + margin.left)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+        d3.csv("data/anscombe_I.csv", function(data) {
+              data.forEach(function(d) {
+              d.x = +d.x; // http://learnjsdata.com/read_data.html
+              d.y = +d.y; // http://learnjsdata.com/read_data.html
+            });
+            checkDataset(data);
+
+            //x.domain(d3.extent(data, function(d) {return d[xVal];}));
+            //x.domain([0, d3.max(data, function(d) {return d[xVal];})]);
+            console.log(d3.max(data, function(d) {return d["x"];}))
+            x.domain([0, d3.max(data, function(d) {return d["x"];})]);
+            y.domain([0, d3.max(data, function(d) {return d[yVal];})]);
+        
+          // Add the scatterplot points
+        svg.selectAll("circle")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("r", 5)
+            .attr("cx", function(d) {return x(d[xVal]);})
+            .attr("cy", function(d) {return y(d[yVal]);})
+            .attr("fill","lightblue")
+          // Add the X Axis
+        svg.append("g")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(d3.axisBottom(x));
+          // Add the Y Axis
+        svg.append("g")
+            .call(d3.axisLeft(y));
+        });
+
+        d3.csv("data/anscombe_II.csv", function(dataset) {
+            checkDataset(dataset);
+        });
+
+        d3.csv("data/anscombe_III.csv", function(dataset) {
+            checkDataset(dataset);
+        });
+
+        d3.csv("data/anscombe_IV.csv", function(dataset) {
+            checkDataset(dataset);
+        });
+
+
+        //d3.csv("data/anscombe_II.csv", function(dataset) {
+        //    console.log(dataset);
+        //    checkDataset(dataset);
+        //});
+ 
+        //d3.csv("data/anscombe_I.csv", function(data) {
+    
+        //console.log(something["x"]);
+        //console.log(typeof(something));
+
+        //var anscombe_II = d3.csv("data/anscombe_II.csv", function(anscombe_II) {
+        //});
+        //var anscombe_III = d3.csv("data/anscombe_III.csv", function(anscombe_III) {
+        //});
+        //var anscombe_IV = d3.csv("data/anscombe_IV.csv", function(anscombe_IV) {
+        //});
+ 
         // Leave this to test your data uploading. All data uploading should be above this line
         function checkDataset(dataset) {
             if (dataset.length == 11)
@@ -44,6 +127,11 @@
                 $("#partOne").append("<p>data loaded incorrectly. Try using the debugger to help you find the bug!</p>");
         }
         
+        //checkDataset(anscombe_I);
+        //checkDataset(anscombe_II);
+        //checkDataset(anscombe_III);
+        //checkDataset(anscombe_IV);
+ 
         // Put your part two code here ***********************
         
         // Put your part three & four code here ***********************
