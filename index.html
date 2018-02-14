@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Project 0</title>
-<style type="text/css" href="project0.css"></style>
+<style type="text/css" href="project1.css"></style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <!--Put your D3 import statement between these two lines-->
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -15,14 +15,14 @@
     
     <div id="partTwo">
         <h1>Part Two: </h1>
-        <div id="barchart">
+        <div id="scatterplot">
+            <p id="scatterLabel"></p>
         </div>
 	</div>
     
     <div id="partThree">
         <h1>Part Three &amp; Four: </h1>
-        <div id="scatterplot">
-            <p id="scatterLabel"></p>
+        <div id="linegraph">
         </div>
 	</div>
     
@@ -66,7 +66,6 @@
  
         //d3.csv("data/anscombe_I.csv", function(data) {
     
-        //console.log(something["x"]);
         //console.log(typeof(something));
 
         //var anscombe_II = d3.csv("data/anscombe_II.csv", function(anscombe_II) {
@@ -85,7 +84,10 @@
         }
         
         // Put your part two code here ***********************
+        // https://stackoverflow.com/questions/23703089/d3-js-change-color-and-size-on-line-graph-dot-on-mouseover
+
         function scatterPlot(data) {
+ 
             var margin = {top: 20, right: 20, bottom: 30, left: 50};
             var width = 960 - margin.left - margin.right;
             var height = 500 - margin.top - margin.bottom;
@@ -97,7 +99,7 @@
             // append the svg obgect to the body of the page
             // appends a 'group' element to 'svg'
             // moves the 'group' element to the top left margin
-            var svg = d3.select("#partTwo").append("svg")
+            var svg = d3.select("#scatterplot").append("svg")
             .attr("width", width + margin.right + margin.left)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
@@ -108,6 +110,7 @@
             y.domain([0, d3.max(data, function(d) {return d["y"];})]);
             
             // Add the scatterplot points
+
             svg.selectAll("circle")
                 .data(data)
                 .enter()
@@ -115,7 +118,17 @@
                 .attr("r", 5)
                 .attr("cx", function(d) {return x(d["x"]);})
                 .attr("cy", function(d) {return y(d["y"]);})
-                .attr("fill","lightblue")
+                .style("fill","lightblue")
+                .on("click", function(d) {
+                    d3.select("#scatterLabel").text("data: (" + d.x + ", " + d.y + ")");
+                })
+                .on("mouseover", function(d) {
+                    d3.select(this).attr("r", 5).style("fill", "red");
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).attr("r", 5).style("fill", "lightblue");
+                 });
+
               // Add the X Axis
             svg.append("g")
                 .attr("transform", "translate(0, " + height + ")")
@@ -138,6 +151,7 @@
         });
 
         // Put your part three & four code here ***********************
+        // Note: ``mouseover'' part is referred to http://bl.ocks.org/weiglemc/6185069
         function lineGraph(data) {
             //https://gist.github.com/d3noob/402dd382a51a4f6eea487f9a35566de0
             var line = d3.line()
@@ -155,7 +169,7 @@
             // append the svg obgect to the body of the page
             // appends a 'group' element to 'svg'
             // moves the 'group' element to the top left margin
-            var svg2 = d3.select("#partThree").append("svg")
+            var svg2 = d3.select("#linegraph").append("svg")
             .attr("width", width + margin.right + margin.left)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
