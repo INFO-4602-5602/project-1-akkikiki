@@ -1,0 +1,203 @@
+<html>
+<head>
+<title>Project 0</title>
+<style type="text/css" href="project1.css"></style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<!--Put your D3 import statement between these two lines-->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+<!--Put your D3 import statement between these two lines-->
+</head>
+
+<body>
+	<div id="partOne">
+        <h1>Part One: </h1>
+	</div>
+    
+    <div id="partTwo">
+        <h1>Part Two: </h1>
+        <div id="scatterplot">
+            <p id="scatterLabel"></p>
+        </div>
+	</div>
+    
+    <div id="partThree">
+        <h1>Part Three &amp; Four: </h1>
+        <div id="linegraph">
+        </div>
+	</div>
+    
+    <div id="partFive">
+        <h1>Part Five: </h1>
+        <div id="scatterplotSet">
+        </div>
+	</div>
+    
+    <script type="text/javascript">
+        // Put your part one code here ***********************
+        d3.csv("data/anscombe_I.csv", function(dataset) {
+            dataset.forEach(function(d) {
+              d.x = +d.x; // http://learnjsdata.com/read_data.html
+              d.y = +d.y; 
+            });
+            // https://stackoverflow.com/questions/29945181/sorting-large-csv-in-d3-js
+            dataset.sort(function(a, b) { return d3.ascending(a.x, b.x); }); 
+            checkDataset(dataset);
+            scatterPlot(dataset, "#scatterplot", 4);
+            scatterPlot(dataset, "#scatterplotSet", 1.2, "anscombe_I");
+            lineGraph(dataset);
+        });
+
+
+        // Leave this to test your data uploading. All data uploading should be above this line
+        function checkDataset(dataset) {
+            if (dataset.length == 11)
+                $("#partOne").append("<p>data loaded correctly</p>");
+            else
+                $("#partOne").append("<p>data loaded incorrectly. Try using the debugger to help you find the bug!</p>");
+        }
+        
+        // Put your part two code here ***********************
+        // https://stackoverflow.com/questions/23703089/d3-js-change-color-and-size-on-line-graph-dot-on-mouseover
+        function scatterPlot(data, division, svg_num, title) {
+ 
+            var margin = {top: 20, right: 20, bottom: 30, left: 50};
+            var width = 240 * svg_num - margin.left - margin.right;
+            var height = 125 * svg_num - margin.top - margin.bottom;
+            
+            // set the ranges
+            var x = d3.scaleLinear().range([0, width]);
+            var y = d3.scaleLinear().range([height, 0]);
+            
+            // append the svg obgect to the body of the page
+            // appends a 'group' element to 'svg'
+            // moves the 'group' element to the top left margin
+            var svg = d3.select(division).append("svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+            x.domain([0, d3.max(data, function(d) {return d.x;})]);
+            y.domain([0, d3.max(data, function(d) {return d.y;})]);
+            
+            // Add the scatterplot points
+
+            svg.selectAll("circle")
+                .data(data)
+                .enter()
+                .append("circle")
+                .attr("r", 5)
+                .attr("cx", function(d) {return x(d.x);})
+                .attr("cy", function(d) {return y(d.y);})
+                .style("fill","lightblue")
+                .on("click", function(d) {
+                    d3.select("#scatterLabel").text("data: (" + d.x + ", " + d.y + ")");
+                })
+                .on("mouseover", function(d) {
+                    d3.select(this).attr("r", 5).style("fill", "red");
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).attr("r", 5).style("fill", "lightblue");
+                 });
+
+              // Add the X Axis
+            svg.append("g")
+                .attr("transform", "translate(0, " + height + ")")
+                .call(d3.axisBottom(x));
+              // Add the Y Axis
+            svg.append("g")
+                .call(d3.axisLeft(y));
+            svg.append("text")
+                    .attr("x", (width / 2))             
+                    .attr("y", 0 - (margin.top / 2) + 2)
+                    .attr("text-anchor", "middle")  
+                    .style("font-size", "16px") 
+                    .style("text-decoration", "underline")  
+                    .text(title);
+        };
+
+        // Put your part three & four code here ***********************
+        // Note: ``mouseover'' part is referred to http://bl.ocks.org/weiglemc/6185069
+        function lineGraph(data) {
+            //https://gist.github.com/d3noob/402dd382a51a4f6eea487f9a35566de0
+            var line = d3.line()
+                .x(function(d) { return x(d.x); })
+                .y(function(d) { return y(d.y); });
+
+            var margin = {top: 20, right: 20, bottom: 30, left: 50};
+            var width = 960 - margin.left - margin.right;
+            var height = 500 - margin.top - margin.bottom;
+            
+            // set the ranges
+            var x = d3.scaleLinear().range([0, width]);
+            var y = d3.scaleLinear().range([height, 0]);
+            
+            // append the svg obgect to the body of the page
+            // appends a 'group' element to 'svg'
+            // moves the 'group' element to the top left margin
+            var svg2 = d3.select("#linegraph").append("svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+            x.domain([0, d3.max(data, function(d) {return d.x;})]);
+            y.domain([0, d3.max(data, function(d) {return d.y;})]);
+            
+              // Add the line graph
+            // https://bl.ocks.org/mbostock/3883245
+            svg2.append("path")
+                .datum(data)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 1.5)
+                .attr("d", line);
+ 
+              // Add the X Axis
+            svg2.append("g")
+                .attr("transform", "translate(0, " + height + ")")
+                .call(d3.axisBottom(x));
+              // Add the Y Axis
+            svg2.append("g")
+                .call(d3.axisLeft(y));
+        };
+
+       
+        // Put your part five code here ***********************
+        //https://stackoverflow.com/questions/20141817/how-to-align-two-svgs-side-by-side-in-d3-js
+        d3.csv("data/anscombe_II.csv", function(dataset) {
+            dataset.forEach(function(d) {
+              d.x = +d.x;
+              d.y = +d.y;
+            });
+            checkDataset(dataset);
+            scatterPlot(dataset, "#scatterplotSet", 1.2, "anscombe_II");
+        });
+
+        d3.csv("data/anscombe_III.csv", function(dataset) {
+            dataset.forEach(function(d) {
+              d.x = +d.x;
+              d.y = +d.y;
+            });
+            checkDataset(dataset);
+            scatterPlot(dataset, "#scatterplotSet", 1.2, "anscombe_III");
+        });
+ 
+        d3.csv("data/anscombe_IV.csv", function(dataset) {
+            dataset.forEach(function(d) {
+              d.x = +d.x; // http://learnjsdata.com/read_data.html
+              d.y = +d.y; // http://learnjsdata.com/read_data.html
+            });
+            checkDataset(dataset);
+            scatterPlot(dataset, "#scatterplotSet", 1.2, "anscombe_IV");
+        });
+        
+    </script>
+</body>
+
+
+</html>
