@@ -58,7 +58,13 @@
         
         // Put your part two code here ***********************
         // https://stackoverflow.com/questions/23703089/d3-js-change-color-and-size-on-line-graph-dot-on-mouseover
-        function scatterPlot(data, division, svg_num, title, line) {
+        function scatterPlot(data, division, svg_num, title) {
+
+            // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
+            var tooltip = d3.select("#scatterLabel").append("div")   
+                        .attr("class", "tooltip")               
+                        .style("opacity", 0);
+
             var margin = {top: 20, right: 20, bottom: 30, left: 50};
             var width = 240 * svg_num - margin.left - margin.right;
             var height = 125 * svg_num - margin.top - margin.bottom;
@@ -95,7 +101,20 @@
                 })
                 .on("mouseover", function(d) {
                     d3.select(this).attr("r", 5).style("fill", "red");
+                    // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html 
+                    tooltip.transition()        
+                        .duration(200)      
+                        .style("opacity", .9); 
+                    tooltip.html(d.x + " , "+ d.y)  
+                         .style("left", (d3.event.pageX) + "px")     
+                         .style("top", (d3.event.pageY - 28) + "px"); 
                 })
+                .on("mouseover", function(d) {
+                    d3.select(this).attr("r", 5).style("fill", "red");
+                    tooltip.transition()        
+                        .duration(500)      
+                        .style("opacity", 0); 
+                 })
                 .on("mouseout", function(d) {
                     d3.select(this).attr("r", 5).style("fill", "lightblue");
                  });
@@ -117,6 +136,7 @@
         };
 
         // Put your part three & four code here ***********************
+        // Part Three code is implemented into Part Two code. 
         // Note: ``mouseover'' part is referred to http://bl.ocks.org/weiglemc/6185069
         function lineGraph(data) {
             //https://gist.github.com/d3noob/402dd382a51a4f6eea487f9a35566de0
