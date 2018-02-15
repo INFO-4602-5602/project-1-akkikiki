@@ -111,6 +111,7 @@
                 })
                 .on("mouseover", function(d) {
                     d3.select(this).attr("r", 5).style("fill", "red");
+                    // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html 
                     tooltip.transition()        
                         .duration(500)      
                         .style("opacity", 0); 
