@@ -34,47 +34,20 @@
     
     <script type="text/javascript">
         // Put your part one code here ***********************
-        // Code referred: http://learnjsdata.com/read_data.html
-        // v5 loads row by row, and v4 reads the csv file in batch.
-        // http://www.tutorialsteacher.com/d3js/loading-data-from-file-in-d3js#d3.csv
-        //var dataset;
-
-        // set the dimensions and margins of the graph
-
         d3.csv("data/anscombe_I.csv", function(dataset) {
             dataset.forEach(function(d) {
               d.x = +d.x; // http://learnjsdata.com/read_data.html
-              d.y = +d.y; // http://learnjsdata.com/read_data.html
+              d.y = +d.y; 
             });
             // https://stackoverflow.com/questions/29945181/sorting-large-csv-in-d3-js
             dataset.sort(function(a, b) { return d3.ascending(a.x, b.x); }); 
             checkDataset(dataset);
-            scatterPlot(dataset);
+            scatterPlot(dataset, "#scatterplot", 4);
+            scatterPlot(dataset, "#scatterplotSet", 1.2, "anscombe_I");
             lineGraph(dataset);
         });
 
-        //d3.csv("data/anscombe_II.csv", function(dataset) {
-        //    console.log(dataset);
-        //    checkDataset(dataset);
-        //    dataset.forEach(function(d) {
-        //      d.x = +d.x; // http://learnjsdata.com/read_data.html
-        //      d.y = +d.y; // http://learnjsdata.com/read_data.html
-        //    });
-        //    checkDataset(dataset);
-        //    scatterPlot(dataset);
-        //});
- 
-        //d3.csv("data/anscombe_I.csv", function(data) {
-    
-        //console.log(typeof(something));
 
-        //var anscombe_II = d3.csv("data/anscombe_II.csv", function(anscombe_II) {
-        //});
-        //var anscombe_III = d3.csv("data/anscombe_III.csv", function(anscombe_III) {
-        //});
-        //var anscombe_IV = d3.csv("data/anscombe_IV.csv", function(anscombe_IV) {
-        //});
- 
         // Leave this to test your data uploading. All data uploading should be above this line
         function checkDataset(dataset) {
             if (dataset.length == 11)
@@ -85,12 +58,10 @@
         
         // Put your part two code here ***********************
         // https://stackoverflow.com/questions/23703089/d3-js-change-color-and-size-on-line-graph-dot-on-mouseover
-
-        function scatterPlot(data) {
- 
+        function scatterPlot(data, division, svg_num, title, line) {
             var margin = {top: 20, right: 20, bottom: 30, left: 50};
-            var width = 960 - margin.left - margin.right;
-            var height = 500 - margin.top - margin.bottom;
+            var width = 240 * svg_num - margin.left - margin.right;
+            var height = 125 * svg_num - margin.top - margin.bottom;
             
             // set the ranges
             var x = d3.scaleLinear().range([0, width]);
@@ -99,7 +70,7 @@
             // append the svg obgect to the body of the page
             // appends a 'group' element to 'svg'
             // moves the 'group' element to the top left margin
-            var svg = d3.select("#scatterplot").append("svg")
+            var svg = d3.select(division).append("svg")
             .attr("width", width + margin.right + margin.left)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
@@ -107,7 +78,7 @@
 
 
             x.domain([0, d3.max(data, function(d) {return d.x;})]);
-            y.domain([0, d3.max(data, function(d) {return d["y"];})]);
+            y.domain([0, d3.max(data, function(d) {return d.y;})]);
             
             // Add the scatterplot points
 
@@ -116,8 +87,8 @@
                 .enter()
                 .append("circle")
                 .attr("r", 5)
-                .attr("cx", function(d) {return x(d["x"]);})
-                .attr("cy", function(d) {return y(d["y"]);})
+                .attr("cx", function(d) {return x(d.x);})
+                .attr("cy", function(d) {return y(d.y);})
                 .style("fill","lightblue")
                 .on("click", function(d) {
                     d3.select("#scatterLabel").text("data: (" + d.x + ", " + d.y + ")");
@@ -136,19 +107,14 @@
               // Add the Y Axis
             svg.append("g")
                 .call(d3.axisLeft(y));
+            svg.append("text")
+                    .attr("x", (width / 2))             
+                    .attr("y", 0 - (margin.top / 2) + 2)
+                    .attr("text-anchor", "middle")  
+                    .style("font-size", "16px") 
+                    .style("text-decoration", "underline")  
+                    .text(title);
         };
-
-        d3.csv("data/anscombe_II.csv", function(dataset) {
-            checkDataset(dataset);
-        });
-
-        d3.csv("data/anscombe_III.csv", function(dataset) {
-            checkDataset(dataset);
-        });
-
-        d3.csv("data/anscombe_IV.csv", function(dataset) {
-            checkDataset(dataset);
-        });
 
         // Put your part three & four code here ***********************
         // Note: ``mouseover'' part is referred to http://bl.ocks.org/weiglemc/6185069
@@ -176,8 +142,8 @@
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-            x.domain([0, d3.max(data, function(d) {return d["x"];})]);
-            y.domain([0, d3.max(data, function(d) {return d["y"];})]);
+            x.domain([0, d3.max(data, function(d) {return d.x;})]);
+            y.domain([0, d3.max(data, function(d) {return d.y;})]);
             
               // Add the line graph
             // https://bl.ocks.org/mbostock/3883245
@@ -201,7 +167,35 @@
 
        
         // Put your part five code here ***********************
-        
+        //https://stackoverflow.com/questions/20141817/how-to-align-two-svgs-side-by-side-in-d3-js
+        d3.csv("data/anscombe_II.csv", function(dataset) {
+            dataset.forEach(function(d) {
+              d.x = +d.x;
+              d.y = +d.y;
+            });
+            checkDataset(dataset);
+            scatterPlot(dataset, "#scatterplotSet", 1.2, "anscombe_II");
+        });
+
+        d3.csv("data/anscombe_III.csv", function(dataset) {
+            dataset.forEach(function(d) {
+              d.x = +d.x;
+              d.y = +d.y;
+            });
+            checkDataset(dataset);
+            scatterPlot(dataset, "#scatterplotSet", 1.2, "anscombe_III");
+        });
+ 
+        d3.csv("data/anscombe_IV.csv", function(dataset) {
+            dataset.forEach(function(d) {
+              d.x = +d.x; // http://learnjsdata.com/read_data.html
+              d.y = +d.y; // http://learnjsdata.com/read_data.html
+                });
+
+            checkDataset(dataset);
+            scatterPlot(dataset, "#scatterplotSet", 1.2, "anscombe_IV");
+                });
+            
     </script>
 </body>
 
